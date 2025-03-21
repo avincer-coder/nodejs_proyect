@@ -1,3 +1,3 @@
-GET https://nodejs-proyect.onrender.com/contacts/2 HTTP/1.1
-###
 GET https://nodejs-proyect.onrender.com/contacts HTTP/1.1
+###
+GET https://nodejs-proyect.onrender.com/contacts/3 HTTP/1.1
