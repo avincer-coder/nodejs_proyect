@@ -76,12 +76,11 @@ const db_mongo = process.env.DB_MONGO;
 const collection_mongo = process.env.COLLECTION_MONGO;
 
 const client = new MongoClient(uri, {
-    serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-    },
+    tls: true,
+    tlsAllowInvalidCertificates: true,
+    serverApi: ServerApiVersion.v1,
 });
+
 
 let collection;
 
