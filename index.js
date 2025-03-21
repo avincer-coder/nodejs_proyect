@@ -1,45 +1,135 @@
+// const express = require("express");
+// console.log("Hola Mundo")
+// const port = 8000;
+// const app = express();
+// const { MongoClient, ServerApiVersion } = require('mongodb');
+// const uri = "mongodb+srv://mongodb:12345@cluster0.fyc2l.mongodb.net/?appName=Cluster0";
+// const db_mongo = "project_1"
+// const collection_mongo = "contacts"
+// const { ObjectId } = require("mongodb");
+
+
+
+// app.get("/contacts", async (req, res)=>{
+//     const collection = await connectDB();
+//     if (!collection) return res.status(500).json({ error: "No se pudo conectar a la base de datos" });
+  
+//     try {
+//         const data = await collection.find().toArray();
+//         res.json(data);
+//     } catch (error) {
+//       res.status(500).json({ error: "Error al obtener los datos" });
+//     }
+// });
+// app.get("/contacts/:id", async (req, res)=>{
+
+//     console.log(req.params.id)
+
+//     const collection = await connectDB();
+//     if (!collection) return res.status(500).json({ error: "No se pudo conectar a la base de datos" });
+  
+//     try {
+//       const data = await collection.findOne({ _id: new ObjectId(req.params.id) });
+//       res.json(data);
+//     } catch (error) {
+//       res.status(500).json({ error: "Error al obtener los datos" });
+//     }
+// });
+
+// const client = new MongoClient(uri, {
+//     serverApi: {
+//       version: ServerApiVersion.v1,
+//       strict: true,
+//       deprecationErrors: true,
+//     }
+//   });
+  
+
+// async function connectDB() {
+//     try {
+//       await client.connect();
+//       console.log(" Conectado a MongoDB Atlas");
+//       return client.db(db_mongo).collection(collection_mongo);
+//     } catch (error) {
+//       console.error(" Error al conectar a MongoDB:", error);
+//     }
+//   }
+  
+
+
+// app.listen(port, ()=>{
+//     console.log("Puerto funcionando en" + port)
+// });
+
+
+
+
+
 const express = require("express");
-console.log("Hola Mundo")
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+
+console.log("Hola Mundo");
+
 const port = 8000;
 const app = express();
-const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = "mongodb+srv://mongodb:12345@cluster0.fyc2l.mongodb.net/?appName=Cluster0";
-const db_mongo = "project_1"
-const collection_mongo = "contacts"
-
-app.get("/contacts", async (req, res)=>{
-    const collection = await connectDB();
-    if (!collection) return res.status(500).json({ error: "No se pudo conectar a la base de datos" });
-  
-    try {
-      const data = await collection.findOne({});
-      res.json(data);
-    } catch (error) {
-      res.status(500).json({ error: "Error al obtener los datos" });
-    }
-});
+const db_mongo = "project_1";
+const collection_mongo = "contacts";
 
 const client = new MongoClient(uri, {
     serverApi: {
-      version: ServerApiVersion.v1,
-      strict: true,
-      deprecationErrors: true,
-    }
-  });
-  
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+    },
+});
+
+let collection;
 
 async function connectDB() {
     try {
-      await client.connect();
-      console.log(" Conectado a MongoDB Atlas");
-      return client.db(db_mongo).collection(collection_mongo);
+        await client.connect();
+        console.log("Conectado a MongoDB Atlas");
+        collection = client.db(db_mongo).collection(collection_mongo);
     } catch (error) {
-      console.error(" Error al conectar a MongoDB:", error);
+        console.error("Error al conectar a MongoDB:", error);
     }
-  }
-  
+}
+
+connectDB();
+
+app.get("/contacts", async (req, res) => {
+    if (!collection) return res.status(500).json({ error: "No se pudo conectar a la base de datos" });
+
+    try {
+        const data = await collection.find().toArray();
+        res.json(data);
+    } catch (error) {
+        res.status(500).json({ error: "Error al obtener los datos" });
+    }
+});
+
+app.get("/contacts/:id", async (req, res) => {
+    if (!collection) return res.status(500).json({ error: "No se pudo conectar a la base de datos" });
+
+    const id = parseInt(req.params.id); // Convertimos a número
+
+    try {
+        const data = await collection.findOne({ id: id }); // Buscamos por el campo id
+        if (!data) return res.status(404).json({ error: "Contacto no encontrado" });
+        res.json(data);
+    } catch (error) {
+        res.status(500).json({ error: "Error al obtener los datos" });
+    }
+});
 
 
-app.listen(port, ()=>{
-    console.log("Puerto funcionando en" + port)
+app.listen(port, () => {
+    console.log("Puerto funcionando en " + port);
+});
+
+process.on("SIGINT", async () => {
+    console.log("Cerrando conexión con MongoDB...");
+    await client.close();
+    process.exit(0);
 });
