@@ -62,19 +62,18 @@
 // });
 
 
-
-
-
-const express = require("express");
-const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+import dotenv from 'dotenv'; 
+dotenv.config(); 
+const app = express();
+import express from "express";
+import { MongoClient, ServerApiVersion, ObjectId } from "mongodb";
 
 console.log("Hola Mundo");
 
-const port = 8000;
-const app = express();
-const uri = "mongodb+srv://mongodb:12345@cluster0.fyc2l.mongodb.net/?appName=Cluster0";
-const db_mongo = "project_1";
-const collection_mongo = "contacts";
+const port = process.env.PORT;
+const uri = process.env.URI;
+const db_mongo = process.env.DB_MONGO;
+const collection_mongo = process.env.COLLECTION_MONGO;
 
 const client = new MongoClient(uri, {
     serverApi: {
